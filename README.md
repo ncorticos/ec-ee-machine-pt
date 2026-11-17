@@ -17,5 +17,6 @@ A clean copy of [EC&EE Machine](https://github.com/ncorticos/ec-ee-machine) 1.30
 
 1. Workers & Pages > Create > Import a repository > `ncorticos/ec-ee-machine-pt`, name `quiz-results-pt`.
 2. Settings > Variables and Secrets: `REPO` = `ncorticos/quiz-results-pt`, `CLASS_CODE` (comma-separated class codes),
-   secrets `GITHUB_TOKEN` (fine-grained, contents read/write on `quiz-results-pt` only) and `TEACHER_CODE`.
+   and the same secrets as the `quiz-results` Worker: `TEACHER_CODE` and `GITHUB_TOKEN`.
+   If that token is fine-grained and limited to certain repositories, add `quiz-results-pt` to it (contents read and write).
 3. Deploy. The page sends results to `https://quiz-results-pt.ncorticos.workers.dev`.
