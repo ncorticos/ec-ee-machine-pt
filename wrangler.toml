@@ -14,3 +14,7 @@ keep_vars = true
 # Workers AI, for the Portuguese translation of the bank with Gemma (env.AI in worker.js).
 [ai]
 binding = "AI"
+
+# Results repository of this Worker (not secret).
+[vars]
+REPO = "ncorticos/quiz-results-pt"
