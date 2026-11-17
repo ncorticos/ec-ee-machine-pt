@@ -211,6 +211,31 @@ export default {
   },
 };
 
+/* ---------- class list (private repo roster/roster.json: [{num, name}]) ---------- */
+// Students confirm who they are with their name and student number. The list stays in the private
+// results repository; the page only gets the few entries that match what a student has typed.
+let ROSTER = null, ROSTER_AT = 0;
+const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+async function roster(env) {
+  if (ROSTER && Date.now() - ROSTER_AT < 5 * 60 * 1000) return ROSTER;
+  const r = await fetch(`${GH}/repos/${env.REPO}/contents/roster/roster.json`, { headers: ghHeaders(env, "application/vnd.github.raw+json") });
+  if (!r.ok) throw new Error("roster " + r.status);
+  const j = await r.json();
+  ROSTER = (j.students || []).map(x => ({ num: String(x.num), name: String(x.name), key: fold(x.name) }));
+  ROSTER_AT = Date.now();
+  return ROSTER;
+}
+// Matches for what was typed: a number prefix (4+ digits) or every typed word starting a word of the name (3+ letters).
+async function who(b, env) {
+  const q = fold(b.q).slice(0, 60);
+  if (!/^\d{4,}$/.test(q) && q.replace(/[^a-z]/g, "").length < 3) return json({ ok: true, list: [] });
+  const list = await roster(env), words = q.split(" ").filter(Boolean);
+  const hit = /^\d+$/.test(q)
+    ? list.filter(x => x.num.startsWith(q))
+    : list.filter(x => { const nw = x.key.split(" "); return words.every(w => nw.some(n => n.startsWith(w))); });
+  return json({ ok: true, list: hit.slice(0, 8).map(x => ({ num: x.num, name: x.name })) });
+}
+
 async function handle(req, env) {
   // CORS preflight: a 204 must have no body (new Response("null", {status: 204}) throws)
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: CORS });
@@ -227,6 +252,7 @@ async function handle(req, env) {
     return json({ ok: false, error: "bad json" }, 400);
   }
   if (b && b.action === "translate") return translate(b, env);
+  if (b && b.action === "who") return who(b, env);
   if (b && b.action === "results") return classResults(b, env);
   if (b && b.action === "labstatus") return labStatus(b, env);
   if (b && (b.action === "labopen" || b.action === "labfile" || b.action === "labpoints")) {
@@ -246,7 +272,16 @@ async function handle(req, env) {
   if (!CODES.length || !CODES.includes(b.code)) {
     return json({ ok: false, error: "code" }, 403);
   }
-  const { id, name, klass, lesson, n, score, pct, secs, detail, date } = b;
+  let { id, name, klass, lesson, n, score, pct, secs, detail, date } = b;
+  // Only enrolled students: the number must be on the class list, and the official name is stored.
+  // The teacher may test with the TEACHER_CODE instead.
+  let num = String(b.num || "").replace(/\D/g, "");
+  const teacher = env.TEACHER_CODE && b.tcode === env.TEACHER_CODE;
+  if (!teacher) {
+    const st = (await roster(env)).find(x => x.num === num);
+    if (!st) return json({ ok: false, error: "enrolled" }, 403);
+    name = st.name;
+  } else if (!num) num = "teacher";
   if (
     typeof id !== "string" || !ID_RE.test(id) ||
     !Number.isInteger(n) || n < 1 || n > 200 ||
@@ -262,6 +297,7 @@ async function handle(req, env) {
     date: typeof date === "string" ? date.slice(0, 32) : new Date().toISOString(),
     class: b.code,
     name: String(name || "").slice(0, 60),
+    num: num.slice(0, 20),
     group: String(klass || "").slice(0, 60),
     bank: String(lesson || "").slice(0, 80),
     n, score, pct, secs: secs || 0,

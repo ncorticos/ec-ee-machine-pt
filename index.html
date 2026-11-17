@@ -54,6 +54,12 @@ section.page.on{display:block}
 .controls{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:var(--wash);margin-bottom:16px}
 .ctl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink2)}
 .ctl>label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.07em}
+.who{position:relative}
+.sug{position:absolute;left:0;top:100%;z-index:20;min-width:100%;margin:4px 0 0;padding:4px 0;list-style:none;background:var(--panel,#fff);border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 22px rgba(20,25,60,.14);max-height:260px;overflow:auto}
+.sug li{padding:6px 10px;cursor:pointer;white-space:nowrap;font-size:12.5px}
+.sug li span{color:var(--muted);font-family:var(--mono);margin-left:8px}
+.sug li:hover,.sug li[aria-selected="true"]{background:var(--wash)}
+.ctl input.ok{border-color:#2e7d32}
 select,input[type=number],input[type=text],input[type=password]{font:inherit;font-size:12px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:5px;padding:4px 7px;max-width:230px}
 select:focus,input:focus{outline:2px solid #cfd8ea;outline-offset:0;border-color:var(--c1)}
 .chk{display:inline-flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;color:var(--ink2)}
@@ -327,7 +333,7 @@ pt:{
  lockB:"Definições", codeL:"Código", unlockedMsg:"Desbloqueado — volte a bloquear antes da aula.",
  wrongCode:"Código incorreto.", triesLeft:"tentativas restantes.",
  lockedMsg:"Bloqueado após códigos errados — tente dentro de", minShort:"min.",
- needId:"Indique o nome e o grupo para começar.", badName:"O nome não pode ser um link — escreva o seu nome.", bankNeed:"Escolha a aula para começar.", lessonClosed:"Esta aula está encerrada — escolha outra.",
+ needId:"Indique o nome e o grupo para começar.", num:"N.º de aluno", needEnrolled:"Escolha o seu nome na lista de inscritos (escreva o nome ou o n.º de aluno).", notEnrolled:"Este nome / n.º de aluno não está inscrito na unidade curricular.", rosterDown:"Não foi possível consultar a lista de inscritos. Verifique a ligação e tente outra vez.", badName:"O nome não pode ser um link — escreva o seu nome.", bankNeed:"Escolha a aula para começar.", lessonClosed:"Esta aula está encerrada — escolha outra.",
  calA:"Calendário Académico",
  reqRestart:"Pedir reinício", overT:"Tempo esgotado",
  overP:"O ciclo está bloqueado. Peça ao professor para desbloquear e reiniciar.",
@@ -398,7 +404,7 @@ en:{
  lockB:"Settings", codeL:"Code", unlockedMsg:"Unlocked — re-lock before class.",
  wrongCode:"Wrong code.", triesLeft:"attempts left.",
  lockedMsg:"Locked after wrong codes — retry in", minShort:"min.",
- needId:"Enter your name and group to start.", badName:"Name cannot be a link — type your name.", bankNeed:"Choose the lecture to start.", lessonClosed:"This lecture is closed — choose another.",
+ needId:"Enter your name and group to start.", num:"Student no.", needEnrolled:"Pick your name from the class list (type your name or student number).", notEnrolled:"This name / student number is not enrolled in the course.", rosterDown:"The class list could not be reached. Check your connection and try again.", badName:"Name cannot be a link — type your name.", bankNeed:"Choose the lecture to start.", lessonClosed:"This lecture is closed — choose another.",
  calA:"Academic Calendar",
  reqRestart:"Request restart", overT:"Time is up",
  overP:"The cycle is locked. Ask your teacher to unlock and restart it.",
@@ -615,7 +621,8 @@ function renderQuiz(){
         <span class="ctl"><label>${esc(t("bank"))}</label><select id="c-lesson"${lockL?" disabled":""}>${lessonOptions(defLesson)}</select></span>
         <span class="ctl"><label>${esc(t("nq"))}</label>
           <select id="c-n">${[20,30,40,50].map(v=>`<option value="${v}"${v===selN?" selected":""}${v>bankSize?" disabled":""}>${v}</option>`).join("")}</select></span>
-        <span class="ctl"><label>${esc(t("name"))}</label><input type="text" id="c-name" name="qm-student-nm" placeholder="—" value="" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other"></span>
+        <span class="ctl who"><label>${esc(t("name"))}</label><input type="text" id="c-name" name="qm-student-nm" placeholder="—" value="" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="c-sug"><ul class="sug" id="c-sug" role="listbox" hidden></ul></span>
+        <span class="ctl"><label for="c-num">${esc(t("num"))}</label><input type="text" id="c-num" inputmode="numeric" placeholder="—" value="" style="width:100px" autocomplete="off" data-1p-ignore data-lpignore="true" data-form-type="other"></span>
         <span class="ctl"><label>${esc(t("klass"))}</label><select id="c-klass"><option value="">—</option>${groupOptions(selG)}</select></span>
         <label class="chk"><input type="checkbox" id="c-sq" checked> ${esc(t("shufQ"))}</label>
         <label class="chk"><input type="checkbox" id="c-so" checked> ${esc(t("shufO"))}</label>
@@ -644,7 +651,8 @@ function renderQuiz(){
       if(!LESSON_SEL){ $("#c-warn").textContent=t("bankNeed"); return; }
       if(lessonBlocked(LESSON_SEL)){ $("#c-warn").textContent=t("lessonClosed"); return; }
       if(!nm || !kg){ $("#c-warn").textContent=t("needId"); return; }
-      try{ localStorage.setItem("qml_name",nm); localStorage.setItem("qml_group",kg); }catch(e){}
+      if(!PICK && !UNLOCKED){ $("#c-warn").textContent=t("needEnrolled"); $("#c-name").focus(); return; }
+      try{ localStorage.setItem("qml_name",nm); localStorage.setItem("qml_group",kg); if(PICK) localStorage.setItem("qml_num",PICK.num); }catch(e){}
       const fresh = DEF.mode==="quiz" || !S || (S.done && S.lesson!==LESSON_SEL);
       if(fresh && !confirm(t("leaveConfirm"))) return;
       if(DEF.mode==="quiz"){ startQuiz(); return; }
@@ -660,8 +668,9 @@ function renderQuiz(){
       if(+sel.value>size) sel.value=String([20,30,40,50].filter(v=>v<=size).pop());
       gate();
     };
-    const gate=()=>{ const v=$("#c-name").value.trim(); $("#c-start").disabled = !LESSON_SEL || lessonBlocked(LESSON_SEL) || !v || /^(https?:\/\/|www\.)/i.test(v) || !$("#c-klass").value; $("#c-warn").textContent=""; };
-    $("#c-name").oninput=gate; $("#c-klass").oninput=gate; gate();
+    const gate=()=>{ const v=$("#c-name").value.trim(); $("#c-start").disabled = !LESSON_SEL || lessonBlocked(LESSON_SEL) || !v || /^(https?:\/\/|www\.)/i.test(v) || !$("#c-klass").value || (!PICK && !UNLOCKED); $("#c-warn").textContent=""; };
+    whoBind(gate);
+    $("#c-klass").oninput=gate; gate();
     const cleanName=()=>{ const n=$("#c-name"); if(n && /^(https?:\/\/|www\.)/i.test(n.value.trim())){ n.value=""; gate(); }
       try{ const s=localStorage.getItem("qml_name")||""; if(/^(https?:\/\/|www\.)/i.test(s.trim())) localStorage.removeItem("qml_name"); }catch(e){} };
     [0,400,1200,3000].forEach(ms=>setTimeout(cleanName, ms)); // catches browser autofill / restored junk after load
@@ -842,6 +851,52 @@ async function labSend(k){
   }catch(e){ msg.textContent=await workerDiag(url); }
   btn.disabled=false;
 }
+/* ---------- class list: name <-> student number, enrolled students only ---------- */
+// The list stays on the Worker (private repo); the page asks for the few entries matching what was typed.
+let PICK = null; // {num, name} chosen from the class list
+async function whoAsk(q){
+  const r=await toWorker(submitURL(),{action:"who",q});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok||!j.ok) throw new Error(j.error||r.status);
+  return j.list||[];
+}
+function whoBind(gate){
+  const nmI=$("#c-name"), nuI=$("#c-num"), ul=$("#c-sug"); let timer=0, seq=0, items=[], cur=-1;
+  const close=()=>{ ul.hidden=true; ul.innerHTML=""; items=[]; cur=-1; nmI.setAttribute("aria-expanded","false"); };
+  const mark=()=>{ nmI.classList.toggle("ok",!!PICK); nuI.classList.toggle("ok",!!PICK); };
+  const choose=x=>{ PICK={num:x.num,name:x.name}; nmI.value=x.name; nuI.value=x.num; close(); mark(); gate(); };
+  const show=list=>{
+    items=list; cur=-1;
+    if(!list.length){ close(); return; }
+    ul.innerHTML=list.map((x,i)=>`<li role="option" id="c-sug-${i}" data-i="${i}">${esc(x.name)}<span>${esc(x.num)}</span></li>`).join("");
+    ul.hidden=false; nmI.setAttribute("aria-expanded","true");
+    ul.querySelectorAll("li").forEach(li=>li.onmousedown=e=>{ e.preventDefault(); choose(items[+li.dataset.i]); });
+  };
+  const ask=(q,fromNum)=>{
+    clearTimeout(timer); const my=++seq;
+    timer=setTimeout(async()=>{
+      try{
+        const list=await whoAsk(q); if(my!==seq) return;
+        // a full student number with a single match fills the name straight away
+        if(fromNum && list.length===1 && list[0].num===q.replace(/\D/g,"")){ choose(list[0]); return; }
+        show(list);
+      }catch(e){ if(my===seq){ close(); $("#c-warn").textContent=t("rosterDown"); } }
+    },220);
+  };
+  const edited=()=>{ if(PICK && (nmI.value.trim()!==PICK.name || nuI.value.trim()!==PICK.num)){ PICK=null; mark(); } };
+  nmI.oninput=()=>{ edited(); gate(); ask(nmI.value,false); };
+  nuI.oninput=()=>{ nuI.value=nuI.value.replace(/\D/g,"").slice(0,12); edited(); gate(); ask(nuI.value,true); };
+  const keys=e=>{
+    if(ul.hidden||!items.length) return;
+    if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); cur=(cur+(e.key==="ArrowDown"?1:-1)+items.length)%items.length;
+      ul.querySelectorAll("li").forEach((li,i)=>li.setAttribute("aria-selected",String(i===cur))); nmI.setAttribute("aria-activedescendant","c-sug-"+cur); }
+    else if(e.key==="Enter"&&cur>=0){ e.preventDefault(); choose(items[cur]); }
+    else if(e.key==="Escape") close();
+  };
+  nmI.onkeydown=keys; nuI.onkeydown=keys;
+  nmI.addEventListener("blur",()=>setTimeout(close,150)); nuI.addEventListener("blur",()=>setTimeout(close,150));
+  mark();
+}
 function startQuiz(){
   const nm=$("#c-name").value.trim(), kg=$("#c-klass").value;
   if(/^(https?:\/\/|www\.)/i.test(nm)){
@@ -867,7 +922,7 @@ function startQuiz(){
   });
   const mins = parseInt($("#c-min").value||"0",10);
   Q = { lesson, n, items, ans:{}, i:0, done:false,
-        oneBy:$("#c-ob").checked, name:$("#c-name").value.trim(),
+        oneBy:$("#c-ob").checked, name:$("#c-name").value.trim(), num:PICK?PICK.num:"",
         klass:$("#c-klass").value.trim(), id:newAttemptId(), mins,
         startT:Date.now(), left:mins>0?mins*60:null, timerId:null, bankSize:bank.length };
   if(Q.left!==null){
@@ -980,7 +1035,7 @@ function renderSendPanel(){ // quiz mode: status of the automatic send
 function resultPayload(code,A){ // A: attempt (quiz Q or projector S)
   A=A||Q;
   if(!A.uni) A.uni=UNI;
-  return {code, uni:A.uni, id:A.id, name:A.name, klass:A.klass, lesson:LESSON[LANG][A.lesson],
+  return {code, uni:A.uni, id:A.id, name:A.name, num:A.num||"", tcode:tcodeLoad(), klass:A.klass, lesson:LESSON[LANG][A.lesson],
     n:A.n, score:A.score, pct:+(A.score/A.n*100).toFixed(1), secs:A.secs,
     date:new Date().toISOString(),
     detail:A.items.map((it,i)=>`${it.src+1}:${A.ans[i]===undefined?"-":LETTERS[A.ans[i]]}${A.ans[i]===it.correct?"✓":"✗"}`).join(" ")+(A.leftPage?" [left page]":"")};
@@ -994,8 +1049,9 @@ async function postAttempt(A){ // "" when stored, otherwise the reason to show
   try{
     const r=await toWorker(url, resultPayload(classCode(A.lesson), A));
     if(r.ok){ try{localStorage.setItem("qal_sent_"+A.id,"1");}catch(e){} return ""; }
-    if(r.status===403) return `${t("codeRejected")} ${classCode(A.lesson)}`;
     const j=await r.json().catch(()=>({}));
+    if(r.status===403 && j.error==="enrolled") return t("notEnrolled");
+    if(r.status===403) return `${t("codeRejected")} ${classCode(A.lesson)}`;
     return `${t("srvFail")} (${r.status}${j.error?" "+j.error:""}${j.detail?": "+j.detail:""})`;
   }catch(e){ return await workerDiag(url); }
 }
@@ -1044,7 +1100,7 @@ function startSession(nm,kg){
   P.lesson=LESSON_SEL; projReshuffle();
   const bank=currentBank(P.lesson), sel=$("#c-n"); // "Questions" setting on the start screen (default ?n=, else 20)
   const n=Math.min((sel && parseInt(sel.value,10)) || DEF.n, bank.length);
-  S={id:newAttemptId(), name:nm, klass:kg, lesson:P.lesson, n, ans:{},
+  S={id:newAttemptId(), name:nm, num:PICK?PICK.num:"", klass:kg, lesson:P.lesson, n, ans:{},
      items:P.deck.slice(0,n).map(bi=>({src:bi, correct:bank[bi].a})),
      startT:Date.now(), done:false, timedOut:false, secs:0, score:0, sent:false};
   P.pos=0; P.endsAt=Date.now()+DEF.mins*60*1000;
@@ -1520,6 +1576,7 @@ async function fetchClass(){ // records, or null with the reason shown
     const isNew=tcodeLoad()!==TRCODE; tcodeKeep(true);
     msg.textContent = KIND==="lab" ? (isNew?t("tcKept"):"") // LAB: no quiz attempt count
       : (j.records.length?`${j.records.length} ${t(j.records.length===1?"clsCount1":"clsCount")}`:t("clsNone"))+(j.truncated?` ${t("clsTrunc")}`:"")+(isNew?` · ${t("tcKept")}`:"");
+    j.records.forEach(x=>{ if(x.num && x.num!=="teacher" && !String(x.name).includes(x.num)) x.name=`${x.name} · ${x.num}`; });
     CLS={records:j.records, filter:CLS?CLS.filter:"", ufilter:CLS?CLS.ufilter:"", lab:("lab" in j)?(j.lab||{open:[],subs:{}}):undefined};
     return j.records;
   }catch(e){ msg.textContent=await workerDiag(url); return null; }
