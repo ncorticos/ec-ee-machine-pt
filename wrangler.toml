@@ -1,8 +1,8 @@
-# Cloudflare Worker "quiz-results-lisbon" (worker.js), the results gatekeeper of the quiz page.
+# Cloudflare Worker "quiz-results-pt" (worker.js), the results gatekeeper of the quiz page.
 # Used only when the Worker is connected to this repository
-# (Cloudflare > Workers & Pages > quiz-results-lisbon > Settings > Build > Connect, branch main):
+# (Cloudflare > Workers & Pages > quiz-results-pt > Settings > Build > Connect, branch main):
 # every merge to main then deploys worker.js, with no copy-paste in the dashboard editor.
-name = "quiz-results-lisbon"
+name = "quiz-results-pt"
 main = "worker.js"
 compatibility_date = "2026-09-01"
 workers_dev = true
