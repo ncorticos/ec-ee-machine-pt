@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--
-  EC&EE Machine PT 1.3.0 — 2026-11-17 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
+  EC&EE Machine PT 1.4.0 — 2026-11-17 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
   Conforto Ambiental & Eficiência Energética / Environmental Comfort & Energy Efficiency
   Banco: 1252 perguntas (as 1383 da EC&EE Machine sem as 131 específicas da Polónia), aulas L.00–L.09 (EN) + L.00–L.03 (PT).
 
@@ -281,7 +281,7 @@ code.mono{background:var(--wash);border-color:var(--line2)}
 <header>
   <div class="hbar">
     <div class="brand"><b>EC&amp;EE Machine</b><span data-t="brandsub">Environmental Comfort &amp; Energy Efficiency</span></div>
-    <nav class="booknav" aria-label="Course Book"><a href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw" target="_blank" rel="noopener" data-t="navTheory" data-tt="navBook">Theory</a><a aria-current="page" data-t="navMachine">Machine</a><a href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw" target="_blank" rel="noopener" data-t="navLab" data-tt="navBook">Design Lab</a></nav>
+    <nav class="booknav" aria-label="Course Book"><a href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw" target="_blank" rel="noopener" data-t="navTheory" data-tt="navBook">Theory</a><a aria-current="page" data-t="navMachine">Machine</a><a id="nav-lab" href="lab.html" data-t="navLab">Design Lab</a></nav>
     <div class="kindsel" role="group" id="kindsel" style="display:none">
       <button type="button" data-kind="theory" aria-pressed="true">Theoretical</button>
       <button type="button" data-kind="lab" aria-pressed="false">LAB</button>
@@ -299,7 +299,7 @@ code.mono{background:var(--wash);border-color:var(--line2)}
   <section class="page" id="pg-bank"></section>
   <section class="page" id="pg-res"></section>
   <section class="page" id="pg-lab"></section>
-  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.3.0 · 2026-11-17</span></footer>
+  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.4.0 · 2026-11-17</span></footer>
 </main>
 <script>
 "use strict";
@@ -1862,6 +1862,7 @@ function setLang(l){
   document.querySelectorAll(".langsel button").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.lang===l)));
   document.querySelectorAll("[data-t]").forEach(n=>{ const k=n.getAttribute("data-t"); if(STR[l][k]!==undefined) n.textContent=STR[l][k]; });
   document.querySelectorAll("[data-tt]").forEach(n=>{ const k=n.getAttribute("data-tt"); if(STR[l][k]!==undefined) n.title=STR[l][k]; });
+  { const lb=document.getElementById("nav-lab"); if(lb) lb.href="lab.html?lang="+l; }
   P._lang=l; try{ if(typeof UNI!=="undefined" && UNI) localStorage.setItem("qml_lang_"+UNI,l); }catch(e){}
   drawKind(); renderTabs(); renderPage(); if(typeof UNI!=="undefined") drawUniChip();
 }

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Design Lab · EC&amp;EE</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%239a5b13'/></svg>">
+<style>
+/* Design Lab, the same page as in the Course Book, so the Machine's Design Lab tab lands on the Lab itself. */
+:root { --bg:#f6f4ef; --fg:#1d2326; --muted:#5b6468; --accent:#9a5b13; --rule:#d9d4c7; --panel:#ece8df; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#171b1d; --fg:#e8e6e1; --muted:#a2a9ab; --accent:#e0a458; --rule:#33393c; --panel:#21262a; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#171b1d; --fg:#e8e6e1; --muted:#a2a9ab; --accent:#e0a458; --rule:#33393c; --panel:#21262a; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:Georgia,"Iowan Old Style","Times New Roman",serif; font-size:17px; line-height:1.6;
+  padding:32px max(16px,env(safe-area-inset-left,0px)) 32px max(16px,env(safe-area-inset-right,0px)); }
+main { max-width:72rem; margin:0 auto; }
+.sans { font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+.bar { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; justify-content:space-between; gap:.5rem; padding:.5rem 0; margin:-.5rem 0 1rem; background:var(--bg); border-bottom:1px solid var(--rule); }
+.seg { display:inline-flex; border:1px solid var(--rule); border-radius:4px; overflow:hidden; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:.78rem; }
+.seg a, .seg button { font:inherit; font-weight:600; color:var(--muted); background:none; border:0; padding:.3rem .65rem; min-height:32px; display:inline-flex; align-items:center; text-decoration:none; cursor:pointer; }
+.seg a:hover, .seg button:hover { color:var(--fg); }
+.seg [aria-current="page"], .seg [aria-pressed="true"] { background:var(--accent); color:var(--bg); }
+.seg a.ext::after { content:" ↗"; font-size:.85em; }
+.seg :focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+h1 { font-size:1.9rem; line-height:1.2; margin:0 0 .4rem; }
+.lead { font-size:1.05rem; max-width:65ch; }
+.grid { display:grid; gap:1rem; grid-template-columns:minmax(0,1fr); margin-top:1.2rem; }
+.card { display:flex; flex-direction:column; border:1px solid var(--rule); border-radius:6px; background:var(--panel); overflow:hidden; }
+.card iframe { display:block; width:100%; aspect-ratio:600/478; border:0; background:var(--bg); }
+.body { display:flex; flex-direction:column; gap:.5rem; flex:1; padding:.8rem 1rem 1rem; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:.88rem; }
+.body h2 { margin:0; font-size:1.02rem; }
+.body p { margin:0; color:var(--muted); }
+.cta { align-self:flex-start; margin-top:auto; padding:.5rem .85rem; min-height:36px; border-radius:4px; background:var(--accent); color:var(--bg); font-weight:600; text-decoration:none; }
+.cta:hover { filter:brightness(1.1); } .cta:focus-visible { outline:2px solid var(--fg); outline-offset:2px; }
+.note { margin-top:1.2rem; color:var(--muted); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; font-size:.8rem; }
+.sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+@media (max-width:719px) { .card iframe { aspect-ratio:auto; height:340px; } }
+@media (min-width:720px) { .grid { grid-template-columns:repeat(6,minmax(0,1fr)); } .card { grid-column:span 3; } }
+@media (min-width:1040px) { .card:nth-child(n+3) { grid-column:span 2; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="bar">
+    <nav class="seg" id="views">
+      <a class="ext" id="v-theory" href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw" target="_blank" rel="noopener">Teoria</a>
+      <a id="v-machine" href="./">Máquina</a>
+      <a id="v-lab" aria-current="page">Design Lab</a>
+    </nav>
+    <div class="seg" id="langs"><button type="button" data-lang="pt">PT</button><button type="button" data-lang="en">EN</button></div>
+  </div>
+  <h1>Design Lab</h1>
+  <p class="lead" id="lead"></p>
+  <div class="grid" id="grid"></div>
+  <p class="note" id="note"></p>
+</main>
+<script>
+var T = {
+  pt: { lead: 'A parte prática do curso: cinco ferramentas para analisar o clima, projetar, construir, medir e classificar. Passe o ponteiro por uma figura para ver o que a ferramenta faz e, depois, abra a aplicação.', open: 'Abrir a aplicação', store: 'Abrir na App Store', newtab: '(abre num novo separador)', note: 'As figuras explicam o que cada ferramenta faz; os valores são exemplos, não resultados das ferramentas.', theory: 'Teoria', machine: 'Máquina', book: 'Abre o Manual do Curso num novo separador', views: 'Parte do curso', group: 'Idioma' },
+  en: { lead: 'The practical part of the course: five tools to analyse a climate, design, build, measure and rate. Move the pointer over a figure to see what the tool does, then open the app.', open: 'Open the app', store: 'Open in the App Store', newtab: '(opens in a new tab)', note: 'The figures explain what each tool does; their values are examples, not results from the tools.', theory: 'Theory', machine: 'Machine', book: 'Opens the Course Book in a new tab', views: 'Part of the course', group: 'Language' }
+};
+var APPS = [
+  { id: 'climate', url: 'https://cfcduarte363.github.io/climate-advisor/', name: 'Climate Advisor',
+    pt: 'Abre um ficheiro meteorológico .epw e mostra o ano em tapetes horários, a carta psicrométrica com as zonas de Givoni, rosas dos ventos, percurso solar, conforto adaptativo e graus-dias.',
+    en: 'Opens an .epw weather file and shows the year as hourly carpets, the psychrometric chart with Givoni zones, wind roses, sun path, adaptive comfort and degree-days.' },
+  { id: 'architecture', url: 'https://ncorticos.github.io/architecture-advisor-pt/', name: 'Architecture Advisor',
+    pt: 'A partir do local e do clima, classifica o clima (Köppen–Geiger, zonas do SCE) e orienta o projeto bioclimático: orientação, compacidade, cobertura, envidraçados, sombreamento e ar.',
+    en: 'From the site and its climate, classifies the climate (Köppen–Geiger, SCE zones) and guides bioclimatic design: orientation, compactness, roof, glazing, shading and air.' },
+  { id: 'construction', url: 'https://ncorticos.github.io/construction-advisor-pt/', name: 'Construction Advisor',
+    pt: 'Monta cada elemento construtivo camada a camada, calcula o coeficiente U face ao limite do SCE, o isolamento em falta e o orçamento por elemento e total.',
+    en: 'Builds each construction element layer by layer and works out its U-value against the SCE limit, the missing insulation and the budget per element and in total.' },
+  { id: 'field', url: 'https://ncorticos.github.io/field-advisor-pt/', name: 'Field Advisor',
+    pt: 'Transforma o telemóvel num medidor didático: ruído, reverberação (RT60) e luz, dentro e fora da janela. Não substitui um sonómetro nem um luxímetro.',
+    en: 'Turns your phone into a teaching meter: noise, reverberation (RT60) and light, inside and outside the window. It does not replace a sound or light meter.' },
+  { id: 'certificate', url: 'https://apps.apple.com/pt/app/certificado-energ%C3%A9tico/id6760972219?l=en-GB', name: 'Certificado Energético', store: true,
+    pt: 'App para iPhone e iPad que estima a classe energética de uma habitação em Portugal, de A+ a F, em seis passos. É uma estimativa, não um certificado oficial da ADENE.',
+    en: 'iPhone and iPad app that estimates a home\'s energy class in Portugal, from A+ to F, in six steps. It is an estimate, not an official ADENE certificate.' }
+];
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function firstLang(){
+  try { var q = new URLSearchParams(location.search).get('lang'); if (q === 'pt' || q === 'en') return q; } catch (e) {}
+  try { var v = localStorage.getItem('qml_lang_lisbon'); if (v === 'pt' || v === 'en') return v; } catch (e) {}
+  return (navigator.language || 'pt').toLowerCase().indexOf('en') === 0 ? 'en' : 'pt';
+}
+function render(l){
+  var t = T[l], dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.lang = l === 'pt' ? 'pt-PT' : 'en';
+  document.getElementById('lead').textContent = t.lead;
+  document.getElementById('note').textContent = t.note;
+  var th = document.getElementById('v-theory'); th.textContent = t.theory; th.title = t.book;
+  var mc = document.getElementById('v-machine'); mc.textContent = t.machine; mc.href = './?lang=' + l;
+  document.getElementById('views').setAttribute('aria-label', t.views);
+  document.getElementById('langs').setAttribute('aria-label', t.group);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-lang]'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.lang === l)); });
+  document.getElementById('grid').innerHTML = APPS.map(function(a){
+    return '<article class="card"><iframe loading="lazy" title="' + esc(a.name) + '" src="lab/' + a.id + '-' + l + (dark ? '' : '-light') + '.html"></iframe><div class="body"><h2>' + esc(a.name) + '</h2><p>' + esc(a[l]) + '</p><a class="cta" href="' + a.url + '" target="_blank" rel="noopener">' + (a.store ? t.store : t.open) + ' <span aria-hidden="true">↗</span><span class="sr"> ' + t.newtab + '</span></a></div></article>';
+  }).join('');
+  try { var u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState(null, '', u); } catch (e) {}
+  try { localStorage.setItem('qml_lang_lisbon', l); } catch (e) {}
+}
+Array.prototype.forEach.call(document.querySelectorAll('[data-lang]'), function(b){ b.addEventListener('click', function(){ render(b.dataset.lang); }); });
+render(firstLang());
+</script>
+</body>
+</html>
