@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--
-  EC&EE Machine PT 1.4.2 — 2026-11-17 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
+  EC&EE Machine PT 1.4.3 — 2026-11-25 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
   Conforto Ambiental & Eficiência Energética / Environmental Comfort & Energy Efficiency
   Banco: 1252 perguntas (as 1383 da EC&EE Machine sem as 131 específicas da Polónia), aulas L.00–L.09 (EN) + L.00–L.03 (PT).
 
@@ -299,7 +299,7 @@ code.mono{background:var(--wash);border-color:var(--line2)}
   <section class="page" id="pg-bank"></section>
   <section class="page" id="pg-res"></section>
   <section class="page" id="pg-lab"></section>
-  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.4.2 · 2026-11-17</span></footer>
+  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.4.3 · 2026-11-25</span></footer>
 </main>
 <script>
 "use strict";
@@ -542,7 +542,7 @@ function shuffle(a){
 }
 function sampleIdx(n,k){ return shuffle([...Array(n).keys()]).slice(0,k); }
 /* Final exam: 2 random questions from each lesson (theme t = 1..10), lessons in order. */
-const EXAM_PER = 2, EXAM_MINS = 30;
+const EXAM_PER = 2, EXAM_MINS = 20;
 const isExam = k => k==="exam";
 function examIdx(bank){
   const out=[];
