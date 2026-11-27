@@ -89,6 +89,7 @@ function render(l){
   document.getElementById('lead').textContent = t.lead;
   document.getElementById('note').textContent = t.note;
   var th = document.getElementById('v-theory'); th.textContent = t.theory; th.title = t.book;
+  th.href = 'https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw?uni=lisbon&lang=' + l; th.removeAttribute('target'); // back to the book on Lisbon, no chooser
   var mc = document.getElementById('v-machine'); mc.textContent = t.machine; mc.href = './?lang=' + l;
   document.getElementById('views').setAttribute('aria-label', t.views);
   document.getElementById('langs').setAttribute('aria-label', t.group);

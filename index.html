@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--
-  EC&EE Machine PT 1.4.3 — 2026-11-25 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
+  EC&EE Machine PT 1.5.0 — 2026-11-27 (clean copy of EC&EE Machine 1.30.0 for the Lisbon School of Architecture)
   Conforto Ambiental & Eficiência Energética / Environmental Comfort & Energy Efficiency
   Banco: 1252 perguntas (as 1383 da EC&EE Machine sem as 131 específicas da Polónia), aulas L.00–L.09 (EN) + L.00–L.03 (PT).
 
@@ -281,7 +281,7 @@ code.mono{background:var(--wash);border-color:var(--line2)}
 <header>
   <div class="hbar">
     <div class="brand"><b>EC&amp;EE Machine</b><span data-t="brandsub">Environmental Comfort &amp; Energy Efficiency</span></div>
-    <nav class="booknav" aria-label="Course Book"><a href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw" target="_blank" rel="noopener" data-t="navTheory" data-tt="navBook">Theory</a><a aria-current="page" data-t="navMachine">Machine</a><a id="nav-lab" href="lab.html" data-t="navLab">Design Lab</a></nav>
+    <nav class="booknav" aria-label="Course Book"><a id="nav-book" href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw?uni=lisbon&amp;lang=en" data-t="navTheory" data-tt="navBook">← Theory</a><a aria-current="page" data-t="navMachine">Machine</a><a id="nav-lab" href="lab.html" data-t="navLab">Design Lab</a></nav>
     <div class="kindsel" role="group" id="kindsel" style="display:none">
       <button type="button" data-kind="theory" aria-pressed="true">Theoretical</button>
       <button type="button" data-kind="lab" aria-pressed="false">LAB</button>
@@ -299,7 +299,7 @@ code.mono{background:var(--wash);border-color:var(--line2)}
   <section class="page" id="pg-bank"></section>
   <section class="page" id="pg-res"></section>
   <section class="page" id="pg-lab"></section>
-  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.4.3 · 2026-11-25</span></footer>
+  <footer><span data-t="foot">Bank extracted from lectures L.00–L.10 and the Course Book (exam) · each attempt shuffles questions and options · single file, works offline and on GitHub Pages.</span> · <span class="meta" title="Version · release date and time (Lisbon)">PT v1.5.0 · 2026-11-27</span></footer>
 </main>
 <script>
 "use strict";
@@ -307,7 +307,7 @@ const BANKS = {"pt": {"aula0": [{"q": "According to UNEP & GlobalABC (2025), wha
 const COUNTS = {"pt/aula0": 87, "pt/aula1": 46, "pt/aula2": 86, "pt/aula3": 74, "pt/aula10": 100, "pt/exam": 492, "pt/aula4": 89, "pt/aula5": 150, "pt/aula6": 97, "pt/aula7": 182, "pt/aula8": 100, "pt/aula9": 65, "en/aula0": 87, "en/aula1": 114, "en/aula2": 87, "en/aula3": 67, "en/aula4": 89, "en/aula5": 150, "en/aula6": 97, "en/aula7": 182, "en/aula8": 100, "en/aula9": 65, "en/exam": 492};
 const STR = {
 pt:{
- brandsub:"Conforto Ambiental & Eficiência Energética", grade:"Classificação", gradeUnit:"valores", navTheory:"Teoria", navMachine:"Máquina", navLab:"Design Lab", navBook:"Abre o Manual do Curso num novo separador",
+ brandsub:"Conforto Ambiental & Eficiência Energética", grade:"Classificação", gradeUnit:"valores", navTheory:"← Teoria", navMachine:"Máquina", navLab:"Design Lab", navBook:"Volta ao Manual do Curso (programa) e sai da Máquina",
  tabs:[["quiz","01","Questionário"],["proj","02","Projetor"],["bank","03","Banco"],["res","04","Resultados"]],
  quizH:"A Prova dos Nove",
  quizP:"Escolha a aula, escreva o nome, escolha o grupo e carregue em Prosseguir para abrir as perguntas.",
@@ -378,7 +378,7 @@ pt:{
  clsSetup:"O Worker não tem a configuração de resultados (GITHUB_TOKEN / REPO).", clsFail:"Erro do Worker — tente de novo."
 },
 en:{
- brandsub:"Environmental Comfort & Energy Efficiency", grade:"Grade", gradeUnit:"out of 20", navTheory:"Theory", navMachine:"Machine", navLab:"Design Lab", navBook:"Opens the Course Book in a new tab",
+ brandsub:"Environmental Comfort & Energy Efficiency", grade:"Grade", gradeUnit:"out of 20", navTheory:"← Theory", navMachine:"Machine", navLab:"Design Lab", navBook:"Back to the Course Book (syllabus); leaves the Machine",
  tabs:[["quiz","01","Quiz"],["proj","02","Projector"],["bank","03","Bank"],["res","04","Results"]],
  quizH:"The Proof of the Pudding",
  quizP:"Choose the lecture, type your name, choose your group, then press Proceed to open the questions.",
@@ -1863,6 +1863,7 @@ function setLang(l){
   document.querySelectorAll("[data-t]").forEach(n=>{ const k=n.getAttribute("data-t"); if(STR[l][k]!==undefined) n.textContent=STR[l][k]; });
   document.querySelectorAll("[data-tt]").forEach(n=>{ const k=n.getAttribute("data-tt"); if(STR[l][k]!==undefined) n.title=STR[l][k]; });
   { const lb=document.getElementById("nav-lab"); if(lb) lb.href="lab.html?lang="+l; }
+  { const bk=document.getElementById("nav-book"); if(bk) bk.href="https://claude.ai/artifact/Cd4iRrSW691vtB2RRGgpXw?uni=lisbon&lang="+l; } // the book opens on Lisbon, no university chooser
   P._lang=l; try{ if(typeof UNI!=="undefined" && UNI) localStorage.setItem("qml_lang_"+UNI,l); }catch(e){}
   drawKind(); renderTabs(); renderPage(); if(typeof UNI!=="undefined") drawUniChip();
 }
